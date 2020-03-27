@@ -6,7 +6,11 @@ const fs = require('fs');
 const express = require('express');
 const app = express();
 const dataBase = `${__dirname}/dev-data/data/tours-simple.json`;
-app.use(express.json());
+app.use(express.json()); /*app.use is required for all middleware! */
+app.use((req, res, next) => {   /*Custom Middleware */
+    console.log("Middleware running...");
+    next(); /*Neccessary for all middleware */
+}); 
 ////////////////////////////////////////
 ////    Listening for requests      ////
 ////     Read Tour JSON data        ////
