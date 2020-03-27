@@ -11,6 +11,10 @@ app.use((req, res, next) => {   /*Custom Middleware */
     console.log("Middleware running...");
     next(); /*Neccessary for all middleware */
 }); 
+app.use((req, res, next) => {   /* Adding DTG to each request */
+    req.requestTime = new Date().toISOString();
+    next(); /*Neccessary for all middleware */
+}); 
 ////////////////////////////////////////
 ////    Listening for requests      ////
 ////     Read Tour JSON data        ////
@@ -25,6 +29,7 @@ const tours = JSON.parse(
 const getAllTours = (req, res) => {
     res.status(200).json({
         status: 'success',
+        "requested DTG": req.requestTime,
         results: tours.length,
         data: {
             tours
@@ -45,8 +50,10 @@ const getTour = (req, res) => {
             message: 'Invalid ID'
         })
     }
+    console.log(req.requestTime);
     res.status(200).json({
         status: 'success',
+        "requested DTG": req.requestTime,
         data: {
             tour
         }
@@ -65,6 +72,7 @@ const createTour = (req, res) => {
     fs.writeFile(`${__dirname}/dev-data/data/tours-simple.json`, JSON.stringify(tours), err => {
         res.status(201).json({
             status: 'success',
+            "Requested Time": req.requestTime,
             data: {
                 tour: newTour
             }
@@ -84,6 +92,7 @@ const updateTour = (req, res) => {
     };
     res.status(200).json({
         status: "success",
+        "requested DTG": req.requestTime,
         data: {
             tour: '<Updated Tour ...>'
         }
@@ -101,6 +110,7 @@ const deleteTour = (req, res) => {
     };
     res.status(204).json({
         status: "success",
+        "requested DTG": req.requestTime,
         data: null
     });
 };
@@ -110,7 +120,7 @@ const deleteTour = (req, res) => {
 app.route('/api/v1/tours')
     .get(getAllTours)       // app.get('/api/v1/tours', getAllTours);
     .post(createTour);      // app.post('/api/v1/tours', createTour);
-app.route('/api/v1/tours')
+app.route('/api/v1/tours/:id')
     .get(getTour)           // app.get('/api/v1/tours/:id', getTour); Adding the ":" allows for additional custom parameters and data variables.
     .patch(updateTour)      // app.patch('/api/v1/tours/:id', updateTour);
     .delete(deleteTour);    // app.delete('/api/v1/tours/:id', deleteTour);
